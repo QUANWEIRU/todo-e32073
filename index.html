@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>征地意见递交 · 行动清单</title>
+<style>
+  :root{--g:#07C160;--bg:#f5f6f7;--card:#fff;--ink:#1a1a1a;--sub:#8a8f99;--line:#ececef}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:15px/1.55 -apple-system,"PingFang SC","Helvetica Neue",Arial,sans-serif}
+  .wrap{max-width:640px;margin:0 auto;padding:14px 12px 90px;overflow-x:hidden}
+  header{background:var(--card);border-radius:14px;padding:16px;margin-bottom:12px;
+         box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  h1{margin:0 0 4px;font-size:19px}
+  .meta{color:var(--sub);font-size:12.5px;overflow-wrap:anywhere}
+  .who{margin-top:9px;font-size:12.5px;color:#666;display:flex;align-items:center;gap:8px}
+  .who select{font-size:12.5px;padding:3px 6px}
+  #sync{margin-left:auto;font-size:11.5px;color:#07C160}
+  .bar{height:8px;background:#ececef;border-radius:99px;margin:14px 0 6px;overflow:hidden}
+  .bar>i{display:block;height:100%;width:0;background:var(--g);border-radius:99px;transition:width .25s}
+  .stat{display:flex;justify-content:space-between;font-size:12.5px;color:var(--sub)}
+  .stat b{color:var(--g);font-size:15px}
+  section{background:var(--card);border-radius:14px;margin-bottom:12px;overflow:hidden;max-width:100%;
+          box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .ph{display:flex;align-items:center;gap:8px;padding:13px 15px 10px;font-weight:600;font-size:14.5px;
+      border-bottom:1px solid var(--line)}
+  .ph .tag{font:600 11px/1 -apple-system;color:#fff;background:var(--g);border-radius:6px;padding:4px 6px}
+  .ph small{margin-left:auto;color:var(--sub);font-weight:400;font-size:11.5px;text-align:right;overflow-wrap:anywhere}
+  .item{display:flex;gap:10px;padding:12px 15px;border-bottom:1px solid var(--line);align-items:flex-start}
+  .item:last-child{border-bottom:0}
+  .item.done .ttl{color:#b3b8c0;text-decoration:line-through}
+  .cb{flex:0 0 22px;width:22px;height:22px;margin-top:1px;border:1.8px solid #cfd4da;border-radius:7px;
+      display:grid;place-items:center;cursor:pointer;transition:.15s}
+  .cb.on{background:var(--g);border-color:var(--g)}
+  .cb.on::after{content:"";width:11px;height:6px;border-left:2.2px solid #fff;border-bottom:2.2px solid #fff;
+      transform:rotate(-45deg) translate(1px,-1px)}
+  .body{flex:1;min-width:0}
+  .row1{display:flex;gap:8px;align-items:baseline}
+  .no{flex:0 0 auto;font:600 12px/1 ui-monospace,Menlo,monospace;color:var(--g);
+      background:#e9f9f0;border-radius:5px;padding:3px 5px}
+  .ttl{flex:1;min-width:0;overflow-wrap:anywhere}
+  .row2{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap;align-items:center;font-size:12px;color:var(--sub)}
+  select,input{border:1px solid var(--line);background:#fafbfc;border-radius:8px;padding:4px 7px;
+      font:12px/1.3 inherit;color:#333;max-width:100%}
+  input.note{flex:1;min-width:90px}
+  .due{background:#fff7e6;color:#b7791f;border-radius:6px;padding:2px 6px;font-size:11.5px}
+  footer{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.94);
+      backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 12px;
+      display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+  button{font:600 13.5px/1 inherit;padding:11px 14px;border-radius:10px;border:1px solid var(--line);
+      background:#fff;color:#333;cursor:pointer}
+  button.primary{background:var(--g);border-color:var(--g);color:#fff}
+  .hint{text-align:center;color:var(--sub);font-size:11.5px;padding:6px 0 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>征地意见递交 · 行动清单</h1>
+    <div class="meta">高府征预告〔2026〕8号 · 全威儒 / 全峻金 / 全威锭 / 全春旺 · 11/7–11/9</div><div class="who">操作人：<select id="me"></select> <span id="sync">○ 连接中…</span></div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="stat"><span>已完成 <b id="dn">0</b> / <span id="tot">0</span></span><span id="pct">0%</span></div>
+  </header>
+  <div id="list"></div>
+  <div class="hint">打勾自动保存在本机浏览器；换成腾讯文档后多人共享同一份进度</div>
+</div>
+<footer>
+  <button class="primary" onclick="copyText()">复制清单文本</button>
+  <button onclick="exportCSV()">导出 CSV</button>
+  <button onclick="resetAll()">重置</button>
+</footer>
+<script>
+const DATA = [
+ {p:"① 今晚 11/7 石排汇合", s:"今晚只做两件：到齐、定份数", items:[
+  {no:"1.1", t:"20:30 前人到齐，到了报「已到」", due:"今晚 20:30"},
+  {no:"1.2", t:"定死打印份数（建议 镇府1+市府1+茂名府1+自留1=4）", due:"今晚"}]},
+ {p:"② 11/8 周日 山岭现场", s:"把“现场依据”做实", items:[
+  {no:"2.1", t:"定死每户面积/权属口径，写成一页签字表", due:"11/8"},
+  {no:"2.2", t:"材料清点：正文、身份证、成员证明、权属凭证、预公告8号", due:"11/8"},
+  {no:"2.3", t:"到场定位经纬度（2 台手机交叉，拐点逐点）", due:"11/8"},
+  {no:"2.4", t:"核实地块是否落在征收红线内", due:"11/8"},
+  {no:"2.5", t:"拍照录像（原图 + 口述日期和地块名）", due:"11/8"},
+  {no:"2.6", t:"到场人签字表", due:"11/8"},
+  {no:"2.7", t:"当晚出：位置图 + 坐标表 + 照片编号表", due:"11/8 夜"}]},
+ {p:"③ 11/9 周一 三级递交", s:"成败点在回执", items:[
+  {no:"3.1", t:"材料打印装订", due:"11/9 早"},
+  {no:"3.2", t:"递交：荷花镇政府 → 自然资源局 → 高州市政府 → 茂名市政府", due:"11/9"},
+  {no:"3.3", t:"每处必须拿回执/签收单/受理编号", due:"11/9"},
+  {no:"3.4", t:"拒收就录像+登记，当晚 EMS 寄出留运单", due:"11/9"},
+  {no:"3.5", t:"当天群里报「级别/收件人/时间/回执号」", due:"11/9 晚"}]},
+ {p:"④ 递交后", s:"先程序后媒体", items:[
+  {no:"4.1", t:"记下答复期限与到期日", due:"递交当日"},
+  {no:"4.2", t:"到期未回复才启动媒体（先程序后媒体）", due:"到期后"},
+  {no:"4.3", t:"每天一条进度，别让群沉底", due:"每日"}]}
+];
+const OWNERS = ["待认领","全威儒","全峻金","全威锭","全春旺"];
+const KEY="zhengdi-todo-v1", MEKEY="zhengdi-me";
+const CFG = {
+  api: "/api/state",              // 本机服务（若在 Mac 上跑，就优先用它）
+  ntfy: "https://ntfy.sh",        // 云端中转（GitHub Pages 静态托管时用）
+  topic: "zd147d3a7db3b7",
+  snapshot: "state.json",         // 由 GitHub Action 定期把 ntfy 事件归档成快照
+  pollMs: 8000,
+  snapshotMs: 30000,
+};
+let mode = null;   // "api" | "ntfy"
+let lastEventTs = 0;
+let seenIds = new Set();
+
+let state = JSON.parse(localStorage.getItem(KEY) || "{}");
+let serverRev = -1;
+let me = localStorage.getItem(MEKEY) || "全威儒";
+const uid = no => no;
+
+function editing(){
+  const a = document.activeElement;
+  return a && (a.tagName === "INPUT" || a.tagName === "SELECT") && document.getElementById("list").contains(a);
+}
+function setSync(ok){
+  const el = document.getElementById("sync");
+  if(!el) return;
+  el.textContent = ok ? "● 已同步（多人共享）" : "○ 离线（仅本机）";
+  el.style.color = ok ? "#07C160" : "#b0b5bd";
+}
+function applyServer(items){
+  if(!items) return false;
+  let changed = false;
+  Object.keys(items).forEach(no => {
+    const s = items[no] || {};
+    const cur = state[no] || {};
+    const next = {done: !!s.done, owner: s.owner || "待认领", note: s.note || "", by: s.by || ""};
+    if(cur.done !== next.done || (cur.owner||"") !== next.owner || (cur.note||"") !== next.note){
+      state[no] = next; changed = true;
+    }
+  });
+  if(changed) localStorage.setItem(KEY, JSON.stringify(state));
+  return changed;
+}
+async function detectMode(){
+  try{
+    const r = await fetch(CFG.api, {cache:"no-store"});
+    if(r.ok && (r.headers.get("content-type")||"").includes("json")){ mode = "api"; return; }
+  }catch(e){}
+  mode = "ntfy";
+}
+function label(){
+  const el = document.getElementById("sync");
+  if(!el) return;
+  if(mode === "api"){ el.textContent = "● 已同步（本机服务）"; el.style.color = "#07C160"; return; }
+  if(mode === "ntfy"){ el.textContent = "● 云端同步（GitHub Pages）"; el.style.color = "#07C160"; return; }
+  el.textContent = "○ 连接中…"; el.style.color = "#b0b5bd";
+}
+function applyEvents(evts){
+  let changed = false;
+  (evts || []).forEach(ev => {
+    const no = ev.no, patch = ev.patch || {}, by = ev.by || "";
+    if(!no) return;
+    const cur = state[no] || {done:false, owner:"待认领", note:""};
+    const next = {done: !!cur.done, owner: cur.owner || "待认领", note: cur.note || "", by: by};
+    if("done" in patch) next.done = !!patch.done;
+    if("owner" in patch) next.owner = patch.owner || "待认领";
+    if("note" in patch) next.note = patch.note || "";
+    if(cur.done !== next.done || (cur.owner||"") !== next.owner || (cur.note||"") !== next.note){ state[no] = next; changed = true; }
+  });
+  return changed;
+}
+async function pullApi(force){
+  const url = CFG.api + ((serverRev >= 0 && !force) ? ("?rev=" + serverRev) : "");
+  const r = await fetch(url, {cache:"no-store"});
+  const j = await r.json();
+  if(j && j.unchanged) return false;
+  if(j && typeof j.rev === "number") serverRev = j.rev;
+  return applyServer(j && j.items);
+}
+async function pullSnapshot(){
+  try{
+    const r = await fetch(CFG.snapshot + "?t=" + Date.now(), {cache:"no-store"});
+    if(!r.ok) return false;
+    const j = await r.json();
+    return applyServer(j && j.items);
+  }catch(e){ return false; }
+}
+async function pullEvents(){
+  try{
+    const since = lastEventTs ? ("&since=" + lastEventTs) : "&since=all";
+    const r = await fetch(CFG.ntfy + "/" + CFG.topic + "/json?poll=1" + since, {cache:"no-store"});
+    if(!r.ok) return false;
+    const txt = await r.text();
+    let changed = false;
+    txt.split("\n").forEach(line => {
+      line = line.trim(); if(!line) return;
+      let ev; try{ ev = JSON.parse(line); }catch(e){ return; }
+      if(ev.event !== "message" || !ev.message) return;
+      if(seenIds.has(ev.id)) return;
+      seenIds.add(ev.id);
+      if(ev.time && ev.time > lastEventTs) lastEventTs = ev.time;
+      let payload; try{ payload = JSON.parse(ev.message); }catch(e){ return; }
+      if(payload && payload.no && payload.no !== "__init__"){ if(applyEvents([payload])) changed = true; }
+    });
+    return changed;
+  }catch(e){ return false; }
+}
+async function push(no, patch){
+  if(mode === "api"){
+    try{ await fetch(CFG.api, {method:"POST", headers:{"Content-Type":"application/json"}, body: JSON.stringify({no:no, patch:patch, by:me})}); label(); return; }
+    catch(e){ mode = "ntfy"; }
+  }
+  try{
+    await fetch(CFG.ntfy + "/" + CFG.topic, {method:"POST", body: JSON.stringify({no:no, patch:patch, by:me, t:Date.now()})});
+    label();
+  }catch(e){ const el = document.getElementById("sync"); if(el){ el.textContent = "○ 离线（仅本机）"; el.style.color="#b0b5bd"; } }
+}
+async function pull(force){
+  try{
+    let changed = false;
+    if(mode === "api"){ changed = await pullApi(force); }
+    else { changed = await pullEvents(); if(!changed) changed = await pullSnapshot(); }
+    if(changed && !editing()) render();
+    label();
+  }catch(e){ /* keep silent */ }
+}
+function save(no, patch){
+  state[no] = Object.assign({done:false, owner:"待认领", note:""}, state[no] || {}, patch);
+  localStorage.setItem(KEY, JSON.stringify(state));
+  push(no, patch);
+}
+function render(){
+  const box = document.getElementById("list");
+  box.innerHTML = "";
+  let total = 0, done = 0;
+  DATA.forEach((ph, i) => {
+    const sec = document.createElement("section");
+    const headEl = document.createElement("div");
+    headEl.className = "ph";
+    headEl.innerHTML = `<span class="tag">${i+1}</span>${ph.p}<small>${ph.s}</small>`;
+    sec.appendChild(headEl);
+    ph.items.forEach(it => {
+      total++;
+      const st = state[uid(it.no)] || {done:false, owner:"待认领", note:""};
+      if(st.done) done++;
+      const el = document.createElement("div");
+      el.className = "item" + (st.done ? " done" : "");
+      el.innerHTML = `
+        <div class="cb ${st.done?'on':''}" data-no="${it.no}"></div>
+        <div class="body">
+          <div class="row1"><span class="no">${it.no}</span><span class="ttl">${it.t}</span></div>
+          <div class="row2">
+            <span class="due">${it.due}</span>
+            <select data-owner="${it.no}">${OWNERS.map(o=>`<option ${o===st.owner?'selected':''}>${o}</option>`).join("")}</select>
+            <input class="note" data-note="${it.no}" placeholder="备注/回执号" value="${(st.note||"").replace(/"/g,'&quot;')}">
+          </div>
+        </div>`;
+      sec.appendChild(el);
+    });
+    box.appendChild(sec);
+  });
+  document.getElementById("tot").textContent = total;
+  document.getElementById("dn").textContent = done;
+  const pct = total ? Math.round(done*100/total) : 0;
+  document.getElementById("bar").style.width = pct + "%";
+  document.getElementById("pct").textContent = pct + "%";
+  const meSel = document.getElementById("me");
+  meSel.innerHTML = OWNERS.filter(o => o !== "待认领").map(o=>`<option ${o===me?'selected':''}>${o}</option>`).join("");
+  bind();
+  localStorage.setItem(KEY, JSON.stringify(state));
+}
+function bind(){
+  document.querySelectorAll(".cb").forEach(cb => cb.onclick = () => {
+    const no = cb.dataset.no;
+    save(no, {done: !(state[no]||{}).done});
+    render();
+  });
+  document.querySelectorAll("select[data-owner]").forEach(s => s.onchange = () => {
+    save(s.dataset.owner, {owner: s.value});
+  });
+  document.querySelectorAll("input[data-note]").forEach(inp => inp.oninput = () => {
+    save(inp.dataset.note, {note: inp.value});
+  });
+  const meSel = document.getElementById("me");
+  if(meSel) meSel.onchange = () => { me = meSel.value; localStorage.setItem(MEKEY, me); };
+}
+function plainText(){
+  let out = "【征地意见递交 · 待办进度】\n";
+  DATA.forEach(ph => {
+    out += "\n" + ph.p + "\n";
+    ph.items.forEach(it => {
+      const st = state[uid(it.no)] || {};
+      out += (st.done ? "✅ " : "⬜ ") + it.no + " " + it.t;
+      if(st.owner && st.owner !== "待认领") out += "（" + st.owner + "）";
+      if(st.note) out += " 备注:" + st.note;
+      out += "\n";
+    });
+  });
+  return out;
+}
+async function copyText(){
+  const t = plainText();
+  try { await navigator.clipboard.writeText(t); alert("已复制，可直接粘贴到微信群"); }
+  catch(e){ prompt("手动复制：", t); }
+}
+function exportCSV(){
+  const rows = [["阶段","编号","事项","截止","责任人","状态","备注"]];
+  DATA.forEach(ph => ph.items.forEach(it => {
+    const st = state[uid(it.no)] || {};
+    rows.push([ph.p, it.no, it.t, it.due, st.owner||"待认领", st.done?"已完成":"未完成", st.note||""]);
+  }));
+  const csv = "\ufeff" + rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(",")).join("\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"}));
+  a.download = "征地意见递交-待办.csv"; a.click();
+}
+function resetAll(){
+  if (!confirm("清空所有勾选和备注？（会同步给所有人）")) return;
+  state = {}; localStorage.removeItem(KEY); render();
+}
+render();
+detectMode().then(() => { label(); return pull(true); }).then(() => {
+  setInterval(pull, CFG.pollMs);
+});
+</script>
+</body>
+</html>

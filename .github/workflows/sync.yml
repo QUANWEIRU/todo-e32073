@@ -1,0 +1,28 @@
+name: sync-todo-state
+on:
+  schedule:
+    - cron: "*/10 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+      - name: Merge ntfy events into state.json
+        run: python tools/sync.py
+      - name: Commit
+        run: |
+          git config user.name "todo-state-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add state.json
+          if git diff --cached --quiet; then
+            echo "no change"
+          else
+            git commit -m "chore: sync todo state"
+            git push
+          fi
