@@ -1,4 +1,12 @@
 {
- "rev": 0,
- "items": {}
+ "rev": 2,
+ "items": {
+  "2.3": {
+   "done": false,
+   "owner": "待认领",
+   "note": "",
+   "by": "reset",
+   "ts": 1794055317
+  }
+ }
 }
