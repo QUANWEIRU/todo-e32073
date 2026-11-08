@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+  <Document>
+    <name>征地标的点（鸭塘涌）</name>
+    <Placemark>
+      <name>1号标的：鸭塘涌岭尾一分山岭</name>
+      <description><![CDATA[海拔 95 米｜读数 北纬 22°16'7" / 东经 110°41'48"<br/>WGS84: 22.268611, 110.696667]]></description>
+      <Point><coordinates>110.696667,22.268611,95</coordinates></Point>
+    </Placemark>
+  </Document>
+</kml>
