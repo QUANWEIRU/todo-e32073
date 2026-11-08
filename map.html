@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>标的点地图 · 鸭塘涌</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css">
+<style>
+  :root{--g:#07C160;--bg:#f5f6f7;--card:#fff;--ink:#1a1a1a;--sub:#8a8f99;--line:#ececef}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,"PingFang SC",Arial,sans-serif}
+  .wrap{max-width:760px;margin:0 auto;padding:12px 12px 40px}
+  header{background:var(--card);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  h1{margin:0 0 4px;font-size:18px}
+  .meta{color:var(--sub);font-size:12.5px}
+  .warn{margin-top:8px;background:#fff7e6;color:#8a5a00;border-radius:8px;padding:8px 10px;font-size:12px;line-height:1.5}
+  #map{height:62vh;min-height:340px;border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+  .list{margin-top:10px}
+  .item{background:var(--card);border-radius:12px;padding:12px 14px;margin-bottom:8px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+  .item h3{margin:0 0 6px;font-size:15px}
+  .tag{display:inline-block;background:var(--g);color:#fff;border-radius:6px;padding:2px 7px;font-size:11.5px;margin-right:6px;vertical-align:1px}
+  .rows{font-size:12.5px;color:#555;display:grid;grid-template-columns:auto 1fr;gap:3px 10px}
+  .rows b{color:var(--sub);font-weight:500}
+  .acts{margin-top:9px;display:flex;gap:8px;flex-wrap:wrap}
+  .acts a,.acts button{font:600 12.5px/1 inherit;padding:8px 11px;border-radius:9px;border:1px solid var(--line);background:#fff;color:#333;text-decoration:none;cursor:pointer}
+  .acts a.primary{background:var(--g);border-color:var(--g);color:#fff}
+  .leaflet-tooltip.pt{background:#fff;border:1px solid #dfe3e8;border-radius:8px;padding:3px 7px;font-size:12px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>标的点地图</h1>
+    <div class="meta">高州市荷花镇文山村良山口 · 现场定位记录</div>
+    <div class="warn">
+      底图为高德（GCJ-02 坐标系）；手机 GPS 读数是 WGS-84。下面每一点都同时给出两套坐标，<b>递交材料请用 WGS-84</b>，导航请用高德链接。
+    </div>
+  </header>
+  <div id="map"></div>
+  <div class="list" id="list"></div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const pts = [];
+let map, layer;
+
+function initMap(){
+  map = L.map('map', {zoomControl:true, attributionControl:true}).setView([22.265702, 110.701167], 15);
+  L.tileLayer('https://webrd0{s}.is.autonavi.com/appmaptile?lang=zh_cn&size=1&scale=1&style=8&x={x}&y={y}&z={z}', {
+    subdomains: ['1','2','3','4'], maxZoom: 18,
+    attribution: '底图 © 高德地图'
+  }).addTo(map);
+  layer = L.layerGroup().addTo(map);
+}
+
+function draw(){
+  layer.clearLayers();
+  const bounds = [];
+  pts.forEach((p, i) => {
+    const ll = [p.gcj_lat, p.gcj_lng];
+    bounds.push(ll);
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="background:#07C160;color:#fff;border-radius:50%;width:26px;height:26px;
+             display:flex;align-items:center;justify-content:center;font:700 13px -apple-system;
+             box-shadow:0 2px 6px rgba(0,0,0,.3);border:2px solid #fff">${p.id}</div>`,
+      iconSize: [26,26], iconAnchor: [13,13]
+    });
+    const m = L.marker(ll, {icon}).addTo(layer);
+    m.bindTooltip(p.name, {permanent:true, direction:'right', offset:[14,0], className:'pt'});
+    m.bindPopup(`<b>${p.label}</b><br>
+      海拔 ${p.alt||'-'} 米<br>
+      WGS84：${p.lat}, ${p.lng}<br>
+      GCJ02：${p.gcj_lat}, ${p.gcj_lng}<br>
+      <a href="https://uri.amap.com/marker?position=${p.gcj_lng},${p.gcj_lat}&name=${encodeURIComponent(p.label)}" target="_blank">高德打开</a>`);
+  });
+  if(bounds.length) map.fitBounds(bounds, {padding:[40,40], maxZoom:17});
+}
+
+function render(){
+  const box = document.getElementById('list');
+  box.innerHTML = pts.map(p => `
+    <div class="item">
+      <h3><span class="tag">${p.id}号标的</span>${p.name}</h3>
+      <div class="rows">
+        <b>原始读数</b><span>${p.dms}${p.heading ? ' ｜ 朝向 ' + p.heading : ''}</span>
+        <b>WGS-84</b><span>${p.lat}, ${p.lng}（递交材料用这套）</span>
+        <b>GCJ-02</b><span>${p.gcj_lat}, ${p.gcj_lng}（高德/腾讯地图显示用）</span>
+        <b>海拔</b><span>${p.alt||'-'} 米</span>
+        <b>来源</b><span>${p.source||''}</span>
+      </div>
+      <div class="acts">
+        <a class="primary" target="_blank" href="https://uri.amap.com/marker?position=${p.gcj_lng},${p.gcj_lat}&name=${encodeURIComponent(p.label)}">高德地图打开</a>
+        <a target="_blank" href="https://uri.amap.com/navigation?to=${p.gcj_lng},${p.gcj_lat},${encodeURIComponent(p.name)}&mode=car&policy=1&src=mypage&coordinate=gaode">导航到这里</a>
+        <button onclick="copyTxt('${p.gcj_lng},${p.gcj_lat}')">复制高德坐标</button>
+        <button onclick="copyTxt('${p.lat},${p.lng}')">复制GPS坐标</button>
+      </div>
+    </div>`).join('');
+}
+function copyTxt(t){
+  navigator.clipboard.writeText(t).then(()=>alert('已复制：'+t)).catch(()=>prompt('手动复制：', t));
+}
+fetch('points.json?t=' + Date.now()).then(r=>r.json()).then(j=>{
+  (j.points||[]).forEach(p=>pts.push(p));
+  initMap(); draw(); render();
+}).catch(e=>{
+  initMap();
+  document.getElementById('list').innerHTML = '<div class="item">点位数据加载失败：' + e + '</div>';
+});
+</script>
+</body>
+</html>
